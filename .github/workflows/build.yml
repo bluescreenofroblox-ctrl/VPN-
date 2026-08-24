@@ -18,20 +18,19 @@ jobs:
           java-version: 11
           distribution: temurin
 
-      - name: Move files
+      - name: Create app structure
         run: |
           mkdir -p app/src/main/kotlin/com/example/vpnclient/vpn
           mkdir -p app/src/main/kotlin/com/example/vpnclient/util
-          
-          [ -f MainActivity.kt ] && mv MainActivity.kt app/src/main/kotlin/com/example/vpnclient/
-          [ -f VpnService.kt ] && mv VpnService.kt app/src/main/kotlin/com/example/vpnclient/vpn/
-          [ -f VlessParser.kt ] && mv VlessParser.kt app/src/main/kotlin/com/example/vpnclient/util/
-          [ -f AndroidManifest.xml ] && mv AndroidManifest.xml app/src/main/
+          mv MainActivity.kt app/src/main/kotlin/com/example/vpnclient/ 2>/dev/null || true
+          mv VpnService.kt app/src/main/kotlin/com/example/vpnclient/vpn/ 2>/dev/null || true
+          mv VlessParser.kt app/src/main/kotlin/com/example/vpnclient/util/ 2>/dev/null || true
+          mv AndroidManifest.xml app/src/main/ 2>/dev/null || true
 
-      - name: Build
+      - name: Build with Gradle
         run: |
-          chmod +x gradlew
-          ./gradlew app:assembleDebug app:assembleRelease
+          apt-get update && apt-get install -y gradle
+          gradle app:assembleDebug app:assembleRelease
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
