@@ -10,8 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up JDK 11
         uses: actions/setup-java@v4
@@ -19,21 +18,27 @@ jobs:
           java-version: 11
           distribution: temurin
 
-      - name: Make Gradlew executable
-        run: chmod +x ./gradlew
-
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug --no-daemon
-
-      - name: Build Release APK
-        run: ./gradlew assembleRelease --no-daemon
+      - name: Create project structure
+        run: |
+          mkdir -p app/src/main/kotlin/com/example/vpnclient/vpn
+          mkdir -p app/src/main/kotlin/com/example/vpnclient/util
+          mkdir -p app/src/main/res/values
+          mkdir -p .github/workflows
+          
+          cp MainActivity.kt app/src/main/kotlin/com/example/vpnclient/
+          cp VpnService.kt app/src/main/kotlin/com/example/vpnclient/vpn/
+          cp VlessParser.kt app/src/main/kotlin/com/example/vpnclient/util/
+          cp AndroidManifest.xml app/src/main/
+          cp build.gradle.kts ./
+          
+      - name: Build APK
+        run: |
+          gradle assembleDebug assembleRelease --no-daemon
 
       - name: Upload APKs
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: APK-Build
-          path: |
-            app/build/outputs/apk/debug/**/*.apk
-            app/build/outputs/apk/release/**/*.apk
+          path: app/build/outputs/apk/**/*.apk
           retention-days: 30
