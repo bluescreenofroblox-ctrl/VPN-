@@ -17,25 +17,23 @@ jobs:
         with:
           java-version: 17
           distribution: temurin
+          cache: gradle
 
-      - name: Create app structure
+      - name: Setup directories
         run: |
           mkdir -p app/src/main/kotlin/com/example/vpnclient/vpn
           mkdir -p app/src/main/kotlin/com/example/vpnclient/util
-          mv MainActivity.kt app/src/main/kotlin/com/example/vpnclient/ 2>/dev/null || true
-          mv VpnService.kt app/src/main/kotlin/com/example/vpnclient/vpn/ 2>/dev/null || true
-          mv VlessParser.kt app/src/main/kotlin/com/example/vpnclient/util/ 2>/dev/null || true
-          mv AndroidManifest.xml app/src/main/ 2>/dev/null || true
+          cp MainActivity.kt app/src/main/kotlin/com/example/vpnclient/ 2>/dev/null || true
+          cp VpnService.kt app/src/main/kotlin/com/example/vpnclient/vpn/ 2>/dev/null || true
+          cp VlessParser.kt app/src/main/kotlin/com/example/vpnclient/util/ 2>/dev/null || true
+          cp AndroidManifest.xml app/src/main/ 2>/dev/null || true
 
-      - name: Build with Gradle
-        run: |
-          apt-get update && apt-get install -y gradle
-          gradle app:assembleDebug app:assembleRelease
+      - name: Build APK
+        run: gradle app:assembleDebug --stacktrace
 
       - name: Upload APK
-        if: success()
         uses: actions/upload-artifact@v4
+        if: success()
         with:
-          name: APK
-          path: app/build/outputs/apk/**/*.apk
-          retention-days: 30
+          name: app-debug
+          path: app/build/outputs/apk/debug/*.apk
