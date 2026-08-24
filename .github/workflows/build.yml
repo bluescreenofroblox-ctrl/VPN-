@@ -18,22 +18,18 @@ jobs:
           java-version: 11
           distribution: temurin
 
-      - name: Create project structure
+      - name: Move files to correct structure
         run: |
           mkdir -p app/src/main/kotlin/com/example/vpnclient/vpn
           mkdir -p app/src/main/kotlin/com/example/vpnclient/util
-          mkdir -p app/src/main/res/values
-          mkdir -p .github/workflows
           
-          cp MainActivity.kt app/src/main/kotlin/com/example/vpnclient/
-          cp VpnService.kt app/src/main/kotlin/com/example/vpnclient/vpn/
-          cp VlessParser.kt app/src/main/kotlin/com/example/vpnclient/util/
-          cp AndroidManifest.xml app/src/main/
-          cp build.gradle.kts ./
-          
+          mv MainActivity.kt app/src/main/kotlin/com/example/vpnclient/
+          mv VpnService.kt app/src/main/kotlin/com/example/vpnclient/vpn/
+          mv VlessParser.kt app/src/main/kotlin/com/example/vpnclient/util/
+          mv AndroidManifest.xml app/src/main/
+
       - name: Build APK
-        run: |
-          gradle assembleDebug assembleRelease --no-daemon
+        run: ./gradlew assembleDebug assembleRelease
 
       - name: Upload APKs
         if: success()
@@ -41,4 +37,3 @@ jobs:
         with:
           name: APK-Build
           path: app/build/outputs/apk/**/*.apk
-          retention-days: 30
